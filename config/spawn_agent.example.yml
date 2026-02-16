@@ -1,0 +1,85 @@
+# SpawnAgent Configuration
+# Copy this file to spawn_agent.yml and edit values as needed.
+# Environment variables can be used with ${VAR_NAME} syntax.
+# Environment variables prefixed with SPAWN_AGENT_ override these values.
+
+# --- Provider Settings ---
+provider:
+  # JSON-RPC endpoint URL (required)
+  rpc_url: "${SPAWN_AGENT_RPC_URL}"
+
+  # WebSocket endpoint for real-time subscriptions (optional)
+  ws_url: "${SPAWN_AGENT_WS_URL}"
+
+  # Chain ID (1 = Ethereum Mainnet, 137 = Polygon, 42161 = Arbitrum)
+  chain_id: 1
+
+  # Maximum concurrent RPC connections
+  max_connections: 50
+
+  # Request timeout in seconds
+  request_timeout: 30.0
+
+  # Requests per second rate limit
+  rate_limit: 50
+
+# --- Monitoring Settings ---
+monitoring:
+  # Polling interval in seconds for block-based monitoring
+  poll_interval: 2.0
+
+  # Maximum number of concurrent worker processes
+  max_workers: 1000
+
+  # Supervisor restart limit before circuit-breaking
+  supervisor_restart_limit: 5
+
+  # Time window (seconds) for restart limit counting
+  supervisor_restart_window: 60.0
+
+# --- Alert Settings ---
+alerts:
+  # Telegram notifications
+  telegram:
+    enabled: false
+    bot_token: "${SPAWN_AGENT_TELEGRAM_BOT_TOKEN}"
+    chat_id: "${SPAWN_AGENT_TELEGRAM_CHAT_ID}"
+
+  # Discord notifications
+  discord:
+    enabled: false
+    webhook_url: "${SPAWN_AGENT_DISCORD_WEBHOOK_URL}"
+
+  # Generic webhook
+  webhook:
+    enabled: false
+    url: "${SPAWN_AGENT_WEBHOOK_URL}"
+    method: POST
+    headers:
+      Content-Type: application/json
+
+  # Deduplication window (seconds) to suppress repeat alerts
+  dedup_window: 300.0
+
+# --- Analysis Settings ---
+analysis:
+  # Anomaly detection
+  anomaly:
+    volume_threshold: 5.0      # Multiplier over EMA baseline
+    rapid_tx_threshold: 10     # Transactions within window
+    rapid_tx_window: 60.0      # Window in seconds
+
+  # Pattern matching
+  patterns:
+    min_confidence: 0.6        # Minimum confidence score [0, 1]
+    buffer_size: 5000          # Sliding window size
+
+  # Graph analysis
+  graph:
+    max_depth: 6               # Maximum trace depth
+    max_nodes: 50000           # Maximum graph nodes in memory
+
+# --- Logging ---
+log_level: INFO                # DEBUG, INFO, WARNING, ERROR, CRITICAL
+log_format: text               # text or json
+log_file: null                 # Path to log file (null for stdout only)

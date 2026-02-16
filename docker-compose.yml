@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  spawn-agent:
+    build: .
+    container_name: spawn-agent
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config:ro
+      - spawn-data:/app/data
+    ports:
+      - "8400:8400"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import spawn_agent; print('ok')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - spawn-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Optional: run a Redis instance for caching and pub-sub
+  redis:
+    image: redis:7-alpine
+    container_name: spawn-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - spawn-net
+    profiles:
+      - cache
+
+volumes:
+  spawn-data:
+  redis-data:
+
+networks:
+  spawn-net:
+    driver: bridge
